@@ -2,8 +2,6 @@ clc
 clear
 close all
 
-%-------------------------------------------------------------
-
 %Functions
 function print_matrix_name(M)
     matName = inputname(1); % Gets the name of the passed variable
@@ -50,10 +48,7 @@ print_matrix_name(D_fe)
 
 %Controllability
 Ctrl=[B_fe A_fe*B_fe];
-r=rank(Ctrl); % It has to be 2 to bew controllable
-fprintf("Rank:")
-disp(r)
-
+rank(Ctrl) % It has to be 2 to bew controllable
 
 %Control
 lambda_1=0.8;
@@ -67,10 +62,9 @@ disp(K)
 
 %-------------------------------------------------------------
 
-%Setpoint Controllability
+%Setpoint
+
 P_set=[lambda_1 lambda_2 0.25];
 A_set=[A_fe [0;0]; [1 0] 1];
 B_set=[B_fe; 0];
-K_set=place(A_set, B_set, P_set);
-fprintf("Setpoint Control Gains:")
-disp(K_set)
+
