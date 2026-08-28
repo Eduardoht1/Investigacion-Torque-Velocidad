@@ -45,3 +45,14 @@ print_matrix_name(D_fe)
 %Controllability
 Ctrl=[B_fe A_fe*B_fe];
 rank(Ctrl) % It has to be 2 to bew controllable
+
+%Control
+lambda_1=0.8;
+lambda_2=0.5;
+p=[lambda_1 lambda_2];
+
+%Control Gains
+K=place(A_fe, B_fe, p);
+fprintf("Control Gains:")
+disp(K)
+
