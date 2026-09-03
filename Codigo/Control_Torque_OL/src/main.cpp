@@ -2,7 +2,7 @@
 #include "ACS712.h"
 
 // GPIO 3, 3.3V referencia, 12 bits ADC, 100 mV/A
-ACS712 ACS(3, 3.3, 4095, 100.0);
+ACS712 ACS(8, 3.3, 4095, 100.0);
 
 // Coeficientes de calibración lineal derivados de tus mediciones
 const float CAL_SLOPE = 0.825;   // Factor de escala
@@ -12,11 +12,15 @@ const float CAL_OFFSET = -46.4;  // Offset en mA
 const float ALPHA = 0.15;
 float filteredCurrent = 0.0;
 
+const float Kt=0.436822307;
+float Torque=0.0;
+float current=0.0;
+
 void setup() {
   Serial.begin(115200);
   delay(1000);
 
-  analogSetPinAttenuation(3, ADC_11db);
+  analogSetPinAttenuation(8, ADC_11db);
 
   Serial.println("Calibrando cero del ACS712...");
   ACS.autoMidPointDC(); 
@@ -38,11 +42,25 @@ void loop() {
   }
 
   // 4. Filtro EMA para eliminar oscilaciones
-  filteredCurrent = (ALPHA * corrected_ma) + ((1.0 - ALPHA) * filteredCurrent);
+  filteredCurrent = ((ALPHA * corrected_ma) + ((1.0 - ALPHA) * filteredCurrent)); 
+  Torque=((filteredCurrent+150)/1000)*Kt;
+
+  current=filteredCurrent+170; //150 es un offset calculado
+
+  if (filteredCurrent < 20.0) {
+    filteredCurrent = 0.0;
+    current=0.0;
+    Torque=0.0;
+  }
+
+  
 
   Serial.print("Corriente filtrada: ");
-  Serial.print(filteredCurrent, 1);
-  Serial.println(" mA");
+  Serial.print(current, 1); 
+  Serial.print(" mA");
+  Serial.print(" Torque: ");
+  Serial.print(Torque, 1);
+  Serial.println(" Nm");
 
   delay(100);
 }
